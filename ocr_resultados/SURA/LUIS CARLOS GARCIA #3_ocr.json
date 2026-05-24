@@ -1,0 +1,39 @@
+{
+  "numero_incapacidad": "0-42120165",
+  "tipo": "ENFERMEDAD_GENERAL",
+  "origen": "COMUN",
+  "fecha_expedicion": "2026-05-20",
+  "fecha_atencion": null,
+  "fecha_inicio": "2026-05-20",
+  "fecha_fin": "2026-05-21",
+  "dias": 2,
+  "diagnostico_codigo": "F412",
+  "diagnostico_descripcion": null,
+  "eps_detectada": "SURA",
+  "medico_nombre": "LUCIANA MARCELA LUNA ESCOBAR",
+  "medico_registro": "1082851284",
+  "especialidad_medico": "MEDICO GENERAL",
+  "ips": "VIVA 1A SAN JOSE",
+  "paciente_nombre": "LUIS CARLOS GARCIA URQUIJO",
+  "paciente_tipo_doc": "CC",
+  "paciente_documento": "1065872824",
+  "es_prorroga": false,
+  "numero_incapacidad_previa": null,
+  "confidence": {
+    "overall": 0.9,
+    "eps_detectada": 1.0,
+    "diagnostico_codigo": 0.8,
+    "medico_nombre": 0.9,
+    "fechas": 0.95,
+    "paciente": 0.9
+  },
+  "calidad_documento": "MEDIA",
+  "notas": null,
+  "_meta": {
+    "archivo": "LUIS CARLOS GARCIA #3.pdf",
+    "eps_carpeta": "SURA",
+    "modelo": "google/gemini-2.0-flash-001",
+    "paginas": 1,
+    "tiempo_seg": 8.34
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "numero_incapacidad": "6643872",
+  "tipo": "ENFERMEDAD_GENERAL",
+  "origen": "COMUN",
+  "fecha_expedicion": "2026-01-05",
+  "fecha_atencion": null,
+  "fecha_inicio": "2026-01-05",
+  "fecha_fin": "2026-01-05",
+  "dias": 30,
+  "diagnostico_codigo": "S821",
+  "diagnostico_descripcion": null,
+  "eps_detectada": "EPS Sanitas",
+  "medico_nombre": "ANDRES FELIPE TIJO",
+  "medico_registro": "1019093117",
+  "especialidad_medico": "Médico General CC",
+  "ips": "Centro médico soacha",
+  "paciente_nombre": "Jose Alejandro Rivera Herrera",
+  "paciente_tipo_doc": "CC",
+  "paciente_documento": "1002210114",
+  "es_prorroga": false,
+  "numero_incapacidad_previa": null,
+  "confidence": {
+    "overall": 0.9,
+    "eps_detectada": 1.0,
+    "diagnostico_codigo": 1.0,
+    "medico_nombre": 1.0,
+    "fechas": 1.0,
+    "paciente": 1.0
+  },
+  "calidad_documento": "ALTA",
+  "notas": null,
+  "_meta": {
+    "archivo": "JOSE RIVERA INC #1.pdf",
+    "eps_carpeta": "SANITAS",
+    "modelo": "google/gemini-2.0-flash-001",
+    "paginas": 1,
+    "tiempo_seg": 4.41
+  }
+}

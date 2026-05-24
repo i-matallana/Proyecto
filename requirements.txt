@@ -1,0 +1,8 @@
+fastapi==0.136.1
+uvicorn==0.47.0
+httpx==0.28.1
+PyMuPDF==1.27.2.3
+python-multipart==0.0.29
+openpyxl==3.1.5
+playwright>=1.44.0
+python-dotenv>=1.0.0

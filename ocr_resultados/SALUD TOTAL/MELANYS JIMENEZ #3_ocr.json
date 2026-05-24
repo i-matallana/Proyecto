@@ -1,0 +1,39 @@
+{
+  "numero_incapacidad": "1380",
+  "tipo": null,
+  "origen": "COMUN",
+  "fecha_expedicion": "2024-07-12",
+  "fecha_atencion": null,
+  "fecha_inicio": "2026-05-02",
+  "fecha_fin": "2026-05-02",
+  "dias": 1,
+  "diagnostico_codigo": "C509",
+  "diagnostico_descripcion": null,
+  "eps_detectada": "Salud Total EPS",
+  "medico_nombre": "Alfredo Israel Medina Varela",
+  "medico_registro": null,
+  "especialidad_medico": "MEDICINA DE URGENCIAS",
+  "ips": "VS UUBC VERSALLES",
+  "paciente_nombre": "MELANYS PAOLA IMENEZSANCHEZ",
+  "paciente_tipo_doc": "CC",
+  "paciente_documento": "1002022473",
+  "es_prorroga": false,
+  "numero_incapacidad_previa": null,
+  "confidence": {
+    "overall": 0.8,
+    "eps_detectada": 1.0,
+    "diagnostico_codigo": 1.0,
+    "medico_nombre": 1.0,
+    "fechas": 0.9,
+    "paciente": 1.0
+  },
+  "calidad_documento": "MEDIA",
+  "notas": null,
+  "_meta": {
+    "archivo": "MELANYS JIMENEZ #3.pdf",
+    "eps_carpeta": "SALUD TOTAL",
+    "modelo": "google/gemini-2.0-flash-001",
+    "paginas": 1,
+    "tiempo_seg": 5.55
+  }
+}

@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OCR Comparador — Incapacidades.ai</title>
+  <style>
+    /* ── Reset & Variables ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green-900: #14422f;
+      --green-700: #1B5E42;
+      --green-500: #2E8B5E;
+      --green-200: #A7F3D0;
+      --green-50:  #F0FDF4;
+      --amber:     #F59E0B;
+      --red:       #EF4444;
+      --emerald:   #10B981;
+      --bg:        #F1F5F9;
+      --surface:   #FFFFFF;
+      --border:    #E2E8F0;
+      --text:      #1E293B;
+      --muted:     #64748B;
+      --radius:    12px;
+      --shadow:    0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--green-700);
+      color: #fff;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo {
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,.18);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    header h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: -.3px; }
+    header p  { font-size: .78rem; opacity: .75; margin-top: 1px; }
+    .header-badge {
+      margin-left: auto;
+      background: rgba(255,255,255,.15);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+
+    /* ── Layout ── */
+    main {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-header h2 {
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--green-700);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .step-badge {
+      width: 24px; height: 24px;
+      background: var(--green-700);
+      color: #fff;
+      border-radius: 50%;
+      font-size: .75rem;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .card-body { padding: 22px; }
+
+    /* ── Upload Zone ── */
+    #dropzone {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      position: relative;
+    }
+    #dropzone:hover, #dropzone.drag-over {
+      border-color: var(--green-500);
+      background: var(--green-50);
+    }
+    #dropzone input[type=file] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    }
+    .drop-icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .drop-text { font-size: .95rem; color: var(--muted); }
+    .drop-text strong { color: var(--green-700); }
+    .drop-hint { font-size: .78rem; color: var(--muted); margin-top: 6px; }
+
+    #file-preview {
+      display: none;
+      margin-top: 14px;
+      padding: 12px 16px;
+      background: var(--green-50);
+      border: 1px solid var(--green-200);
+      border-radius: 8px;
+      align-items: center;
+      gap: 12px;
+    }
+    #file-preview .file-icon { font-size: 1.5rem; }
+    #file-preview .file-name { font-weight: 600; font-size: .9rem; }
+    #file-preview .file-meta { font-size: .78rem; color: var(--muted); }
+    .btn-remove {
+      margin-left: auto;
+      background: none; border: none; cursor: pointer;
+      color: var(--muted); font-size: 1.1rem;
+      transition: color .2s;
+    }
+    .btn-remove:hover { color: var(--red); }
+
+    /* ── Models Grid ── */
+    #models-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .model-card {
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all .2s;
+      position: relative;
+      user-select: none;
+    }
+    .model-card:hover { border-color: var(--green-500); background: var(--green-50); }
+    .model-card.selected {
+      border-color: var(--green-700);
+      background: var(--green-50);
+      box-shadow: 0 0 0 3px rgba(27,94,66,.12);
+    }
+    .model-card input[type=checkbox] {
+      position: absolute; top: 12px; right: 12px;
+      width: 18px; height: 18px; cursor: pointer;
+      accent-color: var(--green-700);
+    }
+    .model-provider {
+      font-size: .68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .model-name { font-weight: 700; font-size: .9rem; margin-bottom: 6px; }
+    .model-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+    .tag {
+      font-size: .68rem;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+      background: var(--bg);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .tag.recommended { background: var(--green-50); color: var(--green-700); border-color: var(--green-200); }
+    .tag.free { background: #FFF9F0; color: #B45309; border-color: #FDE68A; }
+    .model-desc { font-size: .75rem; color: var(--muted); line-height: 1.4; }
+    .models-actions {
+      display: flex; gap: 8px; margin-bottom: 14px;
+      flex-wrap: wrap; align-items: center;
+    }
+    .models-actions span { font-size: .8rem; color: var(--muted); margin-left: auto; }
+    .btn-sm {
+      padding: 5px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: .78rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text);
+      transition: all .15s;
+    }
+    .btn-sm:hover { background: var(--bg); border-color: var(--green-500); color: var(--green-700); }
+
+    /* ── Run Button ── */
+    #run-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--green-700);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      letter-spacing: .3px;
+    }
+    #run-btn:hover:not(:disabled) { background: var(--green-900); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(27,94,66,.3); }
+    #run-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* ── Loading ── */
+    .spinner {
+      width: 20px; height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Results ── */
+    #results { display: none; }
+    .results-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .results-header h2 { font-size: 1rem; font-weight: 700; }
+    .results-meta { font-size: .8rem; color: var(--muted); }
+    .view-tabs {
+      margin-left: auto;
+      display: flex;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .view-tab {
+      padding: 6px 14px;
+      border: none;
+      border-radius: 6px;
+      font-size: .8rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: none;
+      color: var(--muted);
+      transition: all .15s;
+    }
+    .view-tab.active { background: var(--surface); color: var(--green-700); box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+
+    /* ── Model Result Cards ── */
+    #view-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
+    #view-table { display: none; overflow-x: auto; }
+
+    .result-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .result-card.has-error { border-color: var(--red); }
+
+    .result-card-header {
+      padding: 14px 18px;
+      background: var(--green-700);
+      color: #fff;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .result-card-header .provider-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.5);
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+    .result-card-header .model-label { font-weight: 700; font-size: .95rem; }
+    .result-card-header .model-provider-tag { font-size: .72rem; opacity: .8; margin-top: 2px; }
+    .result-card-header .model-stats {
+      margin-left: auto;
+      text-align: right;
+      font-size: .78rem;
+      opacity: .9;
+    }
+
+    /* Confidence circle */
+    .confidence-section {
+      padding: 16px 18px 0;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .conf-circle {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      flex-shrink: 0;
+      border: 4px solid transparent;
+    }
+    .conf-circle .conf-pct { font-size: 1.1rem; line-height: 1; }
+    .conf-circle .conf-label { font-size: .6rem; text-transform: uppercase; letter-spacing: .3px; margin-top: 2px; }
+    .conf-high  { border-color: var(--emerald); color: var(--emerald); }
+    .conf-med   { border-color: var(--amber);   color: var(--amber);   }
+    .conf-low   { border-color: var(--red);     color: var(--red);     }
+
+    .conf-bars { flex: 1; }
+    .conf-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: .72rem; }
+    .conf-bar-label { width: 80px; color: var(--muted); text-align: right; flex-shrink: 0; }
+    .conf-bar-track {
+      flex: 1; height: 6px;
+      background: var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .conf-bar-fill {
+      height: 100%;
+      border-radius: 10px;
+      transition: width .6s ease;
+    }
+    .conf-bar-pct { width: 30px; text-align: right; font-weight: 600; }
+
+    /* Fields */
+    .fields-section { padding: 14px 18px 18px; }
+    .fields-section h4 {
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .field-row {
+      display: flex;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: .82rem;
+      align-items: baseline;
+    }
+    .field-row:last-child { border-bottom: none; }
+    .field-key {
+      width: 130px;
+      flex-shrink: 0;
+      color: var(--muted);
+      font-size: .75rem;
+    }
+    .field-val { font-weight: 500; word-break: break-word; }
+    .field-val.null { color: var(--border); font-style: italic; }
+    .field-val.highlight-diff { background: #FEF9C3; padding: 0 4px; border-radius: 4px; }
+
+    .quality-badge {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 20px;
+      font-size: .7rem;
+      font-weight: 700;
+    }
+    .quality-ALTA  { background: #D1FAE5; color: #065F46; }
+    .quality-MEDIA { background: #FEF3C7; color: #92400E; }
+    .quality-BAJA  { background: #FEE2E2; color: #991B1B; }
+
+    .error-box {
+      padding: 18px;
+      background: #FFF5F5;
+      color: var(--red);
+      font-size: .85rem;
+      font-weight: 500;
+      border-top: 1px solid #FEE2E2;
+    }
+
+    /* ── Comparison Table ── */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .82rem;
+      background: var(--surface);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .compare-table th {
+      background: var(--green-700);
+      color: #fff;
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 700;
+      font-size: .78rem;
+      white-space: nowrap;
+    }
+    .compare-table th:first-child { background: var(--green-900); width: 140px; }
+    .compare-table td {
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table tr:hover td { background: var(--green-50); }
+    .compare-table td:first-child {
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .3px;
+      background: var(--bg);
+    }
+    .cell-agree { /* default */ }
+    .cell-diff {
+      background: #FFFBEB !important;
+      border-left: 3px solid var(--amber);
+    }
+    .cell-null { color: var(--border); font-style: italic; }
+    .cell-error { color: var(--red); font-style: italic; }
+
+    .table-header-sub { font-size: .68rem; opacity: .75; font-weight: 400; margin-top: 2px; }
+
+    /* ── Misc ── */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 10px; }
+
+    /* ── CIE-10 Lookup ── */
+    .cie10-badge {
+      display: inline-block;
+      font-size: .63rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 10px;
+      background: #EFF6FF;
+      color: #1D4ED8;
+      border: 1px solid #BFDBFE;
+      margin-left: 6px;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    .cie10-badge.loading {
+      background: #F1F5F9;
+      color: var(--muted);
+      border-color: var(--border);
+      animation: cie10pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes cie10pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+    .cie10-ocr-note {
+      font-size: .68rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 3px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🏥</div>
+  <div>
+    <h1>OCR Comparador</h1>
+    <p>Incapacidades.ai · Extracción con IA</p>
+  </div>
+  <div class="header-badge" id="health-badge">Cargando...</div>
+</header>
+
+<main>
+
+  <!-- Step 1: Upload -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step-badge">1</div>
+      <h2>Subir PDF de incapacidad</h2>
+    </div>
+    <div class="card-body">
+      <div id="dropzone">
+        <input type="file" accept=".pdf" id="file-input" />
+        <div class="drop-icon">📄</div>
+        <div class="drop-text"><strong>Arrastra el PDF aquí</strong> o haz clic para seleccionar</div>
+        <div class="drop-hint">Solo archivos .pdf · Máx. 20 MB</div>
+      </div>
+      <div id="file-preview">
+        <span class="file-icon">📋</span>
+        <div>
+          <div class="file-name" id="file-name">—</div>
+          <div class="file-meta" id="file-meta">—</div>
+        </div>
+        <button class="btn-remove" onclick="removeFile()" title="Quitar archivo">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Model Selection -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step-badge">2</div>
+      <h2>Seleccionar modelos</h2>
+    </div>
+    <div class="card-body">
+      <div class="models-actions">
+        <button class="btn-sm" onclick="selectAll()">Seleccionar todos</button>
+        <button class="btn-sm" onclick="clearAll()">Limpiar</button>
+        <span id="selection-count">0 modelos seleccionados</span>
+      </div>
+      <div id="models-grid">
+        <div class="empty-state"><div>Cargando modelos...</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Run -->
+  <button id="run-btn" onclick="runOCR()" disabled>
+    <span id="run-icon">▶</span>
+    <span id="run-text">Selecciona un PDF y al menos un modelo</span>
+  </button>
+
+  <!-- Results -->
+  <div id="results">
+    <div class="results-header">
+      <div>
+        <h2>Resultados</h2>
+        <div class="results-meta" id="results-meta"></div>
+      </div>
+      <div class="view-tabs" id="view-tabs" style="display:none">
+        <button class="view-tab active" onclick="switchView('cards')">Por modelo</button>
+        <button class="view-tab" onclick="switchView('table')">Comparación</button>
+      </div>
+    </div>
+    <div id="view-cards"></div>
+    <div id="view-table"></div>
+  </div>
+
+</main>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────────
+let currentFile = null;
+let selectedModels = new Set();
+let allModels = {};
+
+// Fields to show in results (order matters)
+const FIELDS = [
+  ['paciente_nombre',          'Paciente'],
+  ['paciente_tipo_doc',        'Tipo doc.'],
+  ['paciente_documento',       'Documento'],
+  ['eps_detectada',            'EPS detectada'],
+  ['tipo',                     'Tipo'],
+  ['origen',                   'Origen'],
+  ['diagnostico_codigo',       'CIE-10'],
+  ['diagnostico_descripcion',  'Diagnóstico'],
+  ['fecha_expedicion',         'F. expedición'],
+  ['fecha_atencion',           'F. atención'],
+  ['fecha_inicio',             'F. inicio'],
+  ['fecha_fin',                'F. fin'],
+  ['dias',                     'Días'],
+  ['es_prorroga',              'Prórroga'],
+  ['numero_incapacidad_previa','Inc. previa'],
+  ['medico_nombre',            'Médico'],
+  ['medico_registro',          'Registro'],
+  ['especialidad_medico',      'Especialidad'],
+  ['ips',                      'IPS'],
+  ['calidad_documento',        'Calidad doc.'],
+  ['notas',                    'Notas'],
+];
+
+const CONFIDENCE_KEYS = [
+  ['eps_detectada', 'EPS'],
+  ['diagnostico_codigo', 'Diagnóstico'],
+  ['medico_nombre', 'Médico'],
+  ['fechas', 'Fechas'],
+  ['paciente', 'Paciente'],
+];
+
+const PROVIDER_COLORS = {
+  Google: '#4285F4',
+  OpenAI: '#10A37F',
+  Anthropic: '#CC785C',
+  Meta: '#0866FF',
+};
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  fetchModels();
+  checkHealth();
+  setupDropzone();
+});
+
+async function checkHealth() {
+  try {
+    const r = await fetch('/api/health');
+    const d = await r.json();
+    document.getElementById('health-badge').textContent =
+      `${d.modelos_disponibles} modelos disponibles`;
+  } catch {
+    document.getElementById('health-badge').textContent = 'API offline';
+  }
+}
+
+async function fetchModels() {
+  try {
+    const r = await fetch('/api/models');
+    const d = await r.json();
+    allModels = d.models;
+    renderModels();
+  } catch (e) {
+    document.getElementById('models-grid').innerHTML =
+      `<div class="empty-state">Error cargando modelos: ${e.message}</div>`;
+  }
+}
+
+function renderModels() {
+  const grid = document.getElementById('models-grid');
+  grid.innerHTML = Object.entries(allModels).map(([id, m]) => `
+    <div class="model-card ${m.recommended ? 'selected' : ''}"
+         id="mc-${CSS.escape(id)}"
+         onclick="toggleModel('${id}')">
+      <input type="checkbox" ${m.recommended ? 'checked' : ''}
+             id="cb-${CSS.escape(id)}"
+             onclick="event.stopPropagation(); toggleModel('${id}')" />
+      <div class="model-provider">${m.provider}</div>
+      <div class="model-name">${m.label}</div>
+      <div class="model-meta">
+        ${m.recommended ? '<span class="tag recommended">Recomendado</span>' : ''}
+        <span class="tag">${m.cost_label}</span>
+        <span class="tag">${m.speed_label}</span>
+        ${m.cost_label === 'Gratis' ? '<span class="tag free">Gratis</span>' : ''}
+      </div>
+      <div class="model-desc">${m.description}</div>
+    </div>
+  `).join('');
+
+  // Pre-select recommended
+  Object.entries(allModels).forEach(([id, m]) => {
+    if (m.recommended) selectedModels.add(id);
+  });
+  updateRunBtn();
+}
+
+function toggleModel(id) {
+  const card = document.getElementById(`mc-${CSS.escape(id)}`);
+  const cb = document.getElementById(`cb-${CSS.escape(id)}`);
+  if (selectedModels.has(id)) {
+    selectedModels.delete(id);
+    card.classList.remove('selected');
+    cb.checked = false;
+  } else {
+    selectedModels.add(id);
+    card.classList.add('selected');
+    cb.checked = true;
+  }
+  updateRunBtn();
+}
+
+function selectAll() {
+  Object.keys(allModels).forEach(id => {
+    selectedModels.add(id);
+    document.getElementById(`mc-${CSS.escape(id)}`)?.classList.add('selected');
+    const cb = document.getElementById(`cb-${CSS.escape(id)}`);
+    if (cb) cb.checked = true;
+  });
+  updateRunBtn();
+}
+
+function clearAll() {
+  Object.keys(allModels).forEach(id => {
+    selectedModels.delete(id);
+    document.getElementById(`mc-${CSS.escape(id)}`)?.classList.remove('selected');
+    const cb = document.getElementById(`cb-${CSS.escape(id)}`);
+    if (cb) cb.checked = false;
+  });
+  updateRunBtn();
+}
+
+// ── File Handling ──────────────────────────────────────────────────────────────
+function setupDropzone() {
+  const dz = document.getElementById('dropzone');
+  const input = document.getElementById('file-input');
+
+  input.addEventListener('change', e => {
+    if (e.target.files[0]) handleFile(e.target.files[0]);
+  });
+
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault();
+    dz.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f && f.name.toLowerCase().endsWith('.pdf')) handleFile(f);
+    else alert('Solo se aceptan archivos PDF.');
+  });
+}
+
+function handleFile(file) {
+  currentFile = file;
+  const preview = document.getElementById('file-preview');
+  document.getElementById('file-name').textContent = file.name;
+  document.getElementById('file-meta').textContent =
+    `${(file.size / 1024).toFixed(1)} KB · PDF`;
+  preview.style.display = 'flex';
+  updateRunBtn();
+}
+
+function removeFile() {
+  currentFile = null;
+  document.getElementById('file-preview').style.display = 'none';
+  document.getElementById('file-input').value = '';
+  updateRunBtn();
+}
+
+function updateRunBtn() {
+  const btn = document.getElementById('run-btn');
+  const count = selectedModels.size;
+  document.getElementById('selection-count').textContent =
+    `${count} modelo${count !== 1 ? 's' : ''} seleccionado${count !== 1 ? 's' : ''}`;
+
+  if (!currentFile) {
+    btn.disabled = true;
+    document.getElementById('run-text').textContent = 'Selecciona un PDF primero';
+  } else if (count === 0) {
+    btn.disabled = true;
+    document.getElementById('run-text').textContent = 'Selecciona al menos un modelo';
+  } else if (count === 1) {
+    btn.disabled = false;
+    const modelId = [...selectedModels][0];
+    const label = allModels[modelId]?.label || modelId;
+    document.getElementById('run-text').textContent = `Extraer con ${label}`;
+  } else {
+    btn.disabled = false;
+    document.getElementById('run-text').textContent = `Comparar ${count} modelos en paralelo`;
+  }
+}
+
+// ── OCR Run ────────────────────────────────────────────────────────────────────
+async function runOCR() {
+  if (!currentFile || selectedModels.size === 0) return;
+
+  const btn = document.getElementById('run-btn');
+  btn.disabled = true;
+  document.getElementById('run-icon').innerHTML =
+    '<div class="spinner"></div>';
+  document.getElementById('run-text').textContent =
+    selectedModels.size > 1
+      ? `Consultando ${selectedModels.size} modelos en paralelo...`
+      : 'Extrayendo datos...';
+
+  document.getElementById('results').style.display = 'none';
+
+  try {
+    const formData = new FormData();
+    formData.append('file', currentFile);
+
+    let data;
+    if (selectedModels.size === 1) {
+      formData.append('model', [...selectedModels][0]);
+      const r = await fetch('/api/ocr/extract', { method: 'POST', body: formData });
+      if (!r.ok) {
+        const err = await r.json();
+        throw new Error(err.detail || r.statusText);
+      }
+      const single = await r.json();
+      data = {
+        archivo: single._archivo,
+        paginas: single._paginas,
+        tiempo_total_seg: single._tiempo_seg,
+        modelos: [single._model_id],
+        resultados: { [single._model_id]: single },
+      };
+    } else {
+      formData.append('models', JSON.stringify([...selectedModels]));
+      const r = await fetch('/api/ocr/compare', { method: 'POST', body: formData });
+      if (!r.ok) {
+        const err = await r.json();
+        throw new Error(err.detail || r.statusText);
+      }
+      data = await r.json();
+    }
+
+    renderResults(data);
+  } catch (e) {
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('view-cards').innerHTML =
+      `<div class="card"><div class="error-box">❌ Error: ${e.message}</div></div>`;
+    document.getElementById('view-tabs').style.display = 'none';
+  } finally {
+    btn.disabled = false;
+    document.getElementById('run-icon').textContent = '▶';
+    updateRunBtn();
+  }
+}
+
+// ── Render Results ─────────────────────────────────────────────────────────────
+async function renderResults(data) {
+  const resultsEl = document.getElementById('results');
+  resultsEl.style.display = 'block';
+
+  const count = data.modelos.length;
+  document.getElementById('results-meta').textContent =
+    `${data.archivo} · ${data.paginas} página(s) · ` +
+    (count > 1
+      ? `${count} modelos en ${data.tiempo_total_seg}s total`
+      : `${data.tiempo_total_seg}s`);
+
+  const tabs = document.getElementById('view-tabs');
+  tabs.style.display = count > 1 ? 'flex' : 'none';
+
+  renderCards(data);
+  if (count > 1) renderTable(data);
+
+  switchView('cards');
+  resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Enriquecer diagnostico_descripcion con CIE-10 oficial (async, sin bloquear UI)
+  const codes = [...new Set(
+    Object.values(data.resultados).map(r => r.diagnostico_codigo).filter(Boolean)
+  )];
+  if (codes.length > 0) {
+    const entries = await Promise.all(codes.map(async code => {
+      try {
+        const res = await fetch(`/api/cie10/${encodeURIComponent(code)}`);
+        if (res.ok) return [code, (await res.json()).descripcion];
+      } catch {}
+      return [code, null];
+    }));
+    applyCIE10Enrichment(data, Object.fromEntries(entries));
+  }
+}
+
+function renderCards(data) {
+  const container = document.getElementById('view-cards');
+  container.innerHTML = data.modelos.map(modelId => {
+    const r = data.resultados[modelId];
+    const info = allModels[modelId] || { label: modelId, provider: '?' };
+
+    if (r._error) {
+      return `
+        <div class="result-card has-error">
+          <div class="result-card-header" style="background:#EF4444">
+            <div>
+              <div class="model-label">${info.label}</div>
+              <div class="model-provider-tag">${info.provider}</div>
+            </div>
+          </div>
+          <div class="error-box">❌ ${r._error}</div>
+        </div>`;
+    }
+
+    const conf = r.confidence || {};
+    const overall = conf.overall ?? 0;
+    const confClass = overall >= 0.8 ? 'conf-high' : overall >= 0.6 ? 'conf-med' : 'conf-low';
+    const provColor = PROVIDER_COLORS[info.provider] || '#64748B';
+    const quality = r.calidad_documento || '?';
+
+    const confBars = CONFIDENCE_KEYS.map(([key, label]) => {
+      const v = conf[key] ?? 0;
+      const color = v >= 0.8 ? '#10B981' : v >= 0.6 ? '#F59E0B' : '#EF4444';
+      return `
+        <div class="conf-bar-row">
+          <span class="conf-bar-label">${label}</span>
+          <div class="conf-bar-track">
+            <div class="conf-bar-fill" style="width:${v*100}%;background:${color}"></div>
+          </div>
+          <span class="conf-bar-pct" style="color:${color}">${Math.round(v*100)}%</span>
+        </div>`;
+    }).join('');
+
+    const fieldRows = FIELDS.map(([key, label]) => {
+      let val = r[key];
+      if (key === 'diagnostico_descripcion') {
+        const hasCodigo = !!r.diagnostico_codigo;
+        const content = (val !== null && val !== undefined) ? String(val) : '';
+        return `<div class="field-row">
+          <span class="field-key">${label}</span>
+          <span class="field-val" ${hasCodigo ? `data-cie10-card="${modelId}"` : ''}>
+            ${content || (hasCodigo ? '' : '<span class="null">—</span>')}
+            ${hasCodigo ? '<span class="cie10-badge loading">CIE-10…</span>' : ''}
+          </span>
+        </div>`;
+      }
+      if (val === null || val === undefined) {
+        return `<div class="field-row"><span class="field-key">${label}</span><span class="field-val null">—</span></div>`;
+      }
+      if (key === 'calidad_documento') {
+        val = `<span class="quality-badge quality-${val}">${val}</span>`;
+      } else if (typeof val === 'boolean') {
+        val = val ? '✓ Sí' : 'No';
+      }
+      return `<div class="field-row"><span class="field-key">${label}</span><span class="field-val">${val}</span></div>`;
+    }).join('');
+
+    return `
+      <div class="result-card">
+        <div class="result-card-header" style="background:${provColor}">
+          <div class="provider-dot"></div>
+          <div>
+            <div class="model-label">${info.label}</div>
+            <div class="model-provider-tag">${info.provider} · ${info.cost_label || ''}</div>
+          </div>
+          <div class="model-stats">
+            <div>${r._tiempo_seg}s</div>
+            <div>${r._paginas} pág.</div>
+          </div>
+        </div>
+        <div class="confidence-section">
+          <div class="conf-circle ${confClass}">
+            <span class="conf-pct">${Math.round(overall*100)}%</span>
+            <span class="conf-label">Conf.</span>
+          </div>
+          <div class="conf-bars">${confBars}</div>
+        </div>
+        <div class="fields-section">
+          <h4>Datos extraídos</h4>
+          ${fieldRows}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderTable(data) {
+  const container = document.getElementById('view-table');
+
+  // Detect fields that differ between models
+  function getVals(field) {
+    return data.modelos.map(mid => {
+      const r = data.resultados[mid];
+      if (!r || r._error) return null;
+      const v = r[field];
+      return v === null || v === undefined ? null : String(v).trim().toLowerCase();
+    });
+  }
+
+  function hasDiff(field) {
+    const vals = getVals(field).filter(v => v !== null);
+    return vals.length > 1 && new Set(vals).size > 1;
+  }
+
+  const headerCols = data.modelos.map(mid => {
+    const info = allModels[mid] || { label: mid, provider: '?' };
+    const r = data.resultados[mid];
+    const provColor = PROVIDER_COLORS[info.provider] || '#64748B';
+    return `<th style="background:${provColor}">
+      ${info.label}
+      <div class="table-header-sub">${info.provider} · ${r?._tiempo_seg ?? '?'}s</div>
+    </th>`;
+  }).join('');
+
+  const rows = FIELDS.map(([key, label]) => {
+    const diff = hasDiff(key);
+    const cells = data.modelos.map(mid => {
+      const r = data.resultados[mid];
+      if (!r) return `<td class="cell-null">—</td>`;
+      if (r._error) return `<td class="cell-error">Error</td>`;
+      const v = r[key];
+      if (key === 'diagnostico_descripcion') {
+        const hasCodigo = !r._error && !!r.diagnostico_codigo;
+        const cls = diff ? 'cell-diff' : 'cell-agree';
+        const content = (v !== null && v !== undefined) ? String(v) : '';
+        return `<td class="${cls}" ${hasCodigo ? `data-cie10-table="${mid}"` : ''}>
+          ${content || (hasCodigo ? '' : '<span class="cell-null">—</span>')}
+          ${hasCodigo ? '<span class="cie10-badge loading">CIE-10…</span>' : ''}
+        </td>`;
+      }
+      if (v === null || v === undefined) return `<td class="cell-null">—</td>`;
+      let display = typeof v === 'boolean' ? (v ? '✓ Sí' : 'No') : v;
+      if (key === 'calidad_documento') {
+        display = `<span class="quality-badge quality-${v}">${v}</span>`;
+      }
+      return `<td class="${diff ? 'cell-diff' : 'cell-agree'}">${display}</td>`;
+    }).join('');
+    return `<tr><td>${label}${diff ? ' ⚠' : ''}</td>${cells}</tr>`;
+  }).join('');
+
+  // Confidence row
+  const confRow = data.modelos.map(mid => {
+    const r = data.resultados[mid];
+    if (!r || r._error) return `<td class="cell-null">—</td>`;
+    const v = r.confidence?.overall ?? 0;
+    const color = v >= 0.8 ? '#10B981' : v >= 0.6 ? '#F59E0B' : '#EF4444';
+    return `<td><strong style="color:${color}">${Math.round(v*100)}%</strong></td>`;
+  }).join('');
+
+  container.innerHTML = `
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Campo</th>
+          ${headerCols}
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Confianza</td>${confRow}
+        </tr>
+        ${rows}
+      </tbody>
+    </table>
+    <p style="font-size:.72rem;color:var(--muted);margin-top:10px;padding-left:4px;">
+      ⚠ Celdas con fondo amarillo = los modelos no coinciden en ese campo
+    </p>`;
+}
+
+function switchView(view) {
+  document.getElementById('view-cards').style.display = view === 'cards' ? 'grid' : 'none';
+  document.getElementById('view-table').style.display = view === 'table' ? 'block' : 'none';
+  document.querySelectorAll('.view-tab').forEach((btn, i) => {
+    btn.classList.toggle('active', (i === 0) === (view === 'cards'));
+  });
+}
+
+function applyCIE10Enrichment(data, cie10Map) {
+  // Tarjetas de modelo
+  document.querySelectorAll('[data-cie10-card]').forEach(el => {
+    const mid = el.getAttribute('data-cie10-card');
+    const r = data.resultados[mid];
+    if (!r || !r.diagnostico_codigo) return;
+    const official = cie10Map[r.diagnostico_codigo];
+    const ocr = (r.diagnostico_descripcion || '').trim();
+    if (official) {
+      const diff = ocr && official.toLowerCase() !== ocr.toLowerCase();
+      el.innerHTML = `${official} <span class="cie10-badge">CIE-10 ES</span>` +
+        (diff ? `<div class="cie10-ocr-note">OCR: "${ocr}"</div>` : '');
+    } else {
+      el.innerHTML = ocr || '<span class="null">—</span>';
+    }
+  });
+
+  // Tabla comparativa
+  document.querySelectorAll('[data-cie10-table]').forEach(el => {
+    const mid = el.getAttribute('data-cie10-table');
+    const r = data.resultados[mid];
+    if (!r || !r.diagnostico_codigo) return;
+    const official = cie10Map[r.diagnostico_codigo];
+    const ocr = (r.diagnostico_descripcion || '').trim();
+    if (official) {
+      const diff = ocr && official.toLowerCase() !== ocr.toLowerCase();
+      el.innerHTML = `${official} <span class="cie10-badge">CIE-10 ES</span>` +
+        (diff ? `<div class="cie10-ocr-note">OCR: "${ocr}"</div>` : '');
+    } else if (ocr) {
+      el.textContent = ocr;
+    }
+  });
+}
+
+// CSS.escape polyfill for older browsers
+if (!CSS.escape) {
+  CSS.escape = s => s.replace(/[^a-zA-Z0-9_-]/g, c => '\\' + c);
+}
+</script>
+</body>
+</html>

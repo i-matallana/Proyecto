@@ -1,0 +1,39 @@
+{
+  "numero_incapacidad": "2",
+  "tipo": null,
+  "origen": "COMUN",
+  "fecha_expedicion": "2026-03-05",
+  "fecha_atencion": null,
+  "fecha_inicio": "2026-03-05",
+  "fecha_fin": "2026-04-05",
+  "dias": 2,
+  "diagnostico_codigo": "H819",
+  "diagnostico_descripcion": "TRASTORNO DE LA FUNCION VESTIBULAR, NO ESPECIFICADO",
+  "eps_detectada": "COOPSANA",
+  "medico_nombre": "ERAINYS YUSETH CHOLES DELUQUE",
+  "medico_registro": null,
+  "especialidad_medico": "OTORRINOLARINGOLOGIA",
+  "ips": null,
+  "paciente_nombre": "LUIS CARLOS GARCIA URQUIJO",
+  "paciente_tipo_doc": null,
+  "paciente_documento": "1065872824",
+  "es_prorroga": false,
+  "numero_incapacidad_previa": null,
+  "confidence": {
+    "overall": 0.8,
+    "eps_detectada": 0.9,
+    "diagnostico_codigo": 0.9,
+    "medico_nombre": 0.9,
+    "fechas": 0.9,
+    "paciente": 0.9
+  },
+  "calidad_documento": "MEDIA",
+  "notas": null,
+  "_meta": {
+    "archivo": "LUIS CARLOS GARCIA #2.pdf",
+    "eps_carpeta": "SURA",
+    "modelo": "google/gemini-2.0-flash-001",
+    "paginas": 1,
+    "tiempo_seg": 4.74
+  }
+}
